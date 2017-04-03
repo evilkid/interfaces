@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="17px" height="17px" viewBox="0 0 17 17" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 41.2 (35397) - http://www.bohemiancoding.com/sketch -->
+    <title>Search icon</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Design-flow" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Home-page-no-search-results" transform="translate(-171.000000, -550.000000)">
+            <g id="Find-a-category" transform="translate(17.000000, 536.000000)">
+                <g id="Search-icon" transform="translate(162.960155, 22.960155) rotate(-45.000000) translate(-162.960155, -22.960155) translate(157.460155, 12.960155)">
+                    <rect id="Rectangle-7" fill="#BCC4CA" x="5" y="10" width="1.5" height="10" rx="0.75"></rect>
+                    <circle id="Oval-2" stroke="#BCC4CA" stroke-width="1.5" cx="5.69999695" cy="5.70001221" r="5"></circle>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
