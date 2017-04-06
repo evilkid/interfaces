@@ -53,13 +53,15 @@
         <div class="left-side" ng-cloak>
             <div class="main-content-navigation">
                 <ul class="left-menu" id="left-menu" onmousewheel="event.stopPropagation()">
-                    <li id="all-category"><a href='#' ng-class="{active: 'All categories' === vm.selectedCategory}"
-                                             ng-click="vm.updateCategory(0, '', 'All categories', vm.allCategoryPostCount)">All
+                    <li id="all-category"><a href='#'
+                                             ng-class="{active: 'All categories' === vm.selectedCategory.title}"
+                                             ng-click="vm.updateCategory({id: 0, slug: '', title: 'All categories',
+                                             post_count: vm.allCategoryPostCount, description: vm.allCategoryDescription})">All
                             categories</a></li>
                     <li ng-repeat="c in vm.categories"
-                        ng-click="vm.updateCategory(c.id, c.slug, c.title, c.description, c.post_count)">
+                        ng-click="vm.updateCategory(c)">
                         <a href
-                           ng-class="{active: c.title.toLowerCase() === vm.selectedCategory.toLowerCase()}">{{c.title}}</a>
+                           ng-class="{active: c.slug.toLowerCase() === vm.selectedCategory.slug.toLowerCase()}">{{c.title}}</a>
                     </li>
                     <li id='magic-line'></li>
                 </ul>
@@ -83,7 +85,8 @@
         </div>
         <div class="main-content" ng-cloak>
             <div class="top-content-panel clearfix">
-                <div class="posts-find">{{vm.selectedCategory}} <span>({{vm.posts_count}})</span></div>
+                <div class="posts-find">{{vm.selectedCategory.title}} <span>({{vm.selectedCategory.post_count}})</span>
+                </div>
                 <a href="#" class="angle"><i class="fa fa-angle-down" aria-hidden="true"></i></a>
                 <div class='top-content-panel-icons'>
                     <a href="#" class="popular" ng-click="vm.sortBy('rate')">
@@ -120,9 +123,9 @@
             <section class="content-section lazy" id="content-section" ng-class="{'loading': vm.loading}">
 
                 <div
-                        ng-repeat="p in vm.posts"
+                        ng-repeat="p in vm.posts" onclick=""
                         ng-style="{ background: ' url({{ p.attachments[0].images.medium_large.url }}) 50% 50% no-repeat' }">
-                    <div class="content-description clearfix">
+                    <div class="content-description clearfix" data-featherlight="#mylightbox">
                         <p class="title">{{p.title}}</p>
                         <p class="date">{{vm.convertDate(p.date) | date}}</p>
                         <a class="like clearfix" ng-class="{ 'liked': vm.liked(p.content) }"
@@ -147,11 +150,54 @@
                 </div>
 
                 <p id="category-description">
-                    {{vm.selectedCategoryDescription}}
+                    {{vm.selectedCategory.description}}
                 </p>
+
+                <button id="myBtn">Open Modal</button>
+
+                <!-- The Modal -->
+
             </section>
         </div>
     </main>
+
+    <div id="myModal" class="modal">
+
+        <!-- Modal content -->
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="header-content">
+                    <span class="title">99 designers</span>
+                    <span class="date">DEC 28, 2017</span>
+                    <span class="rate">
+                        <svg width="14px" height="13px" viewBox="0 0 14 13" version="1.1"
+                             xmlns="http://www.w3.org/2000/svg">
+                                <g id="Design-flow" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                    <g id="Home-page---interactions" transform="translate(-604.000000, -649.000000)"
+                                       fill="#7E8E99">
+                                        <g id="card-on-hover" transform="translate(234.000000, 433.000000)">
+                                            <g id="Loyce-Copy" transform="translate(370.000000, 215.000000)">
+                                                <path d="M12.7970258,2.23468863 C11.2005603,0.616568872 8.61394569,0.609511529 7.00890439,2.21889627 L7.00890439,2.21889627 C5.40582487,0.59400966 2.80637056,0.593656136 1.20286068,2.21810665 C-0.400649201,3.84255716 -0.400998074,6.47666535 1.20208145,8.10155195 L6.99955363,14 L7.01513823,13.9842076 L7.01513823,13.9842076 L12.8126104,8.10155195 L12.8126104,8.10155195 C14.4018569,6.47492822 14.3948911,3.85261896 12.7970258,2.23468863 Z"
+                                                      id="Shape"></path>
+                                            </g>
+                                        </g>
+                                    </g>
+                                </g>
+                            </svg>
+                        25
+
+                    </span>
+                    <span class="download"></span>
+                    <a href="http://www.google.tn" class="visit" target="_blank">visit website</a>
+                </div>
+            </div>
+            <div class="modal-body">
+                <img class="screenshot" src="http://localhost/woo/wp-content/uploads/2017/03/Azendoo-product-page-1.jpg" alt="nothing">
+            </div>
+
+        </div>
+
+    </div>
 
 
     <?php wp_footer(); ?>

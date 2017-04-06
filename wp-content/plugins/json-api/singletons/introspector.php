@@ -71,7 +71,7 @@ class JSON_API_Introspector {
     $wp_categories = get_categories($args);
     $categories = array();
     foreach ($wp_categories as $wp_category) {
-      if ($wp_category->term_id == 1 && $wp_category->slug == 'uncategorized') {
+      if ($wp_category->term_id == 1 && $wp_category->slug == '') {
         continue;
       }
       $categories[] = $this->get_category_object($wp_category);

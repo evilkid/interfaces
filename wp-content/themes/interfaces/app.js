@@ -12,8 +12,8 @@
     function InterfacesController($timeout, $location, $http, $httpParamSerializerJQLike) {
         var vm = this;
 
-        // vm.BASE_URL = "/woo";
-        vm.BASE_URL = "/wordpress";
+        vm.BASE_URL = "/woo";
+        // vm.BASE_URL = "/wordpress";
 
         vm.url = "?json=get_posts&&count=16";
 
@@ -27,10 +27,8 @@
             var tmpUrl = "";
 
             if (url.length > 5) {
-                category = url[4];
-                vm.selectedCategory = null;
-                //vm.selectedCategory = category;
-                tmpUrl = "&category_name=" + category;
+                vm.selectedCategory = {slug: url[4]};
+                tmpUrl = "&category_name=" + vm.selectedCategory.slug;
             }
 
             if (url.length > 6) {
@@ -41,7 +39,6 @@
             $http.get(vm.url + tmpUrl)
                 .then(function (response) {
 
-                    vm.posts_count = response.data.count_total;
                     vm.posts = response.data.posts;
                     vm.totalPages = response.data.pages;
 
@@ -53,36 +50,42 @@
                     vm.loading = false;
 
                     $(".posts-find").show();
-                    if (category && vm.posts.length > 0) {
+
+                    if (vm.selectedCategory.slug && vm.posts.length > 0) {
                         vm.posts[0].categories.some(function (cat) {
-                            if (cat.slug === category) {
-                                vm.selectedCategoryId = cat.id;
-                                vm.selectedCategory = cat.title;
-                                vm.selectedCategoryDescription = cat.description;
+                            if (cat.slug === vm.selectedCategory.slug) {
+                                vm.selectedCategory = cat;
                                 return true;
                             }
                         });
-                    } else {
-                        vm.selectedCategory = null;
+                    }
+
+
+                    if (vm.selectedCategory.slug === undefined) {
+                        vm.selectedCategory.post_count = response.data.count_total;
+                        vm.allCategoryPostCount = response.data.count_total;
+
                     }
                 });
 
             $http.get("?json=get_category_index")
                 .then(function (response) {
-                    $("#all-category").show();
                     vm.categories = response.data.categories;
 
-                    if (!vm.selectedCategory) {
+                    vm.allCategoryDescription = vm.categories.pop().description;
+                    if (vm.selectedCategory.title == "All categories") {
+                        vm.selectedCategory.description = vm.allCategoryDescription;
+                    }
+
+
+                    if (vm.selectedCategory.slug !== undefined && vm.selectedCategory.id === undefined) {
                         vm.categories.some(function (cat) {
-                            if (cat.slug.trim() === category.trim()) {
-                                vm.selectedCategoryId = cat.id;
-                                vm.selectedCategory = cat.title;
-                                vm.selectedCategoryDescription = cat.description;
+                            if (cat.slug === vm.selectedCategory.slug) {
+                                vm.selectedCategory = cat;
 
                                 $timeout(function () {
                                     $('.left-menu a').filter(function (index) {
-                                        console.log(vm.selectedCategory, $(this).text());
-                                        return $(this).text() && vm.selectedCategory && $(this).text().toLowerCase() === vm.selectedCategory.toLowerCase();
+                                        return $(this).text() && vm.selectedCategory.title && $(this).text().toLowerCase() === vm.selectedCategory.title.toLowerCase();
                                     }).trigger("selectItem");
                                     $("#magic-line").show();
                                 }, 0, false);
@@ -92,13 +95,13 @@
                     } else {
                         $timeout(function () {
                             $('.left-menu a').filter(function (index) {
-                                console.log("11", vm.selectedCategory, $(this).text());
-                                return $(this).text() && vm.selectedCategory && $(this).text().toLowerCase() === vm.selectedCategory.toLowerCase();
+                                return $(this).text() && vm.selectedCategory.title && $(this).text().toLowerCase() === vm.selectedCategory.title.toLowerCase();
                             }).trigger("selectItem");
                             $("#magic-line").show();
                         }, 0, false);
                     }
 
+                    $("#all-category").show();
                 });
         };
 
@@ -106,16 +109,14 @@
         vm.COMPARE_BY_DATE = "&orderby=date";
         vm.COMPARE_BY_RATE = "&meta_key=_liked&orderby=meta_value_num";
 
-        vm.selectedCategory = "All categories";
-        vm.selectedCategoryId = 0;
-        vm.selectedCategoryDescription = "";
-        vm.allCategoryPostCount = 0;
+        vm.selectedCategory = {id: 0, title: "All categories"};
+
         vm.categories = [];
 
         vm.posts = [];
 
-        vm.posts_count = 0;
-
+        vm.allCategoryPostCount = 0;
+        vm.allCategoryDescription = "";
 
         vm.sortedBy = "date";
 
@@ -130,8 +131,8 @@
 
         vm.getURL = function () {
             var url = vm.url;
-            if (vm.selectedCategoryId) {
-                url += "&cat=" + vm.selectedCategoryId;
+            if (vm.selectedCategory.id) {
+                url += "&cat=" + vm.selectedCategory.id;
             }
 
             if (vm.sortedBy === "date") {
@@ -209,20 +210,14 @@
             }
         };
 
-        vm.updateCategory = function (categoryId, categorySlug, categoryName, categoryDescription, count) {
-            window.history.pushState({"pageTitle": categoryName}, "", "." + vm.BASE_URL + "/" + categorySlug);
-            vm.selectedCategory = categoryName;
-            vm.selectedCategoryDescription = categoryDescription;
+        vm.updateCategory = function (category) {
 
-            vm.posts_count = count;
-            if (!categoryId) {
-                vm.posts_count = vm.allCategoryPostCount;
-            }
+            vm.selectedCategory = category;
+            window.history.pushState({"pageTitle": vm.selectedCategory.title}, "", "." + vm.BASE_URL + "/" + vm.selectedCategory.slug);
+
             //vm.posts = [];
             vm.loading = true;
             vm.currentPage = 1;
-
-            vm.selectedCategoryId = categoryId;
 
             $http.get(vm.getURL())
                 .then(function (response) {
@@ -236,10 +231,15 @@
 
                     vm.posts_count = response.data.count_total;
 
-                    if (!categoryId && !vm.allCategoryPostCount) {
-                        vm.allCategoryPostCount = response.data.count_total;
-                    }
+                    console.log(vm.selectedCategory.id);
+                    console.log(vm.allCategoryPostCount);
+                    console.log(response);
+                    console.log(category);
 
+                    if (vm.selectedCategory.id === 0 && vm.allCategoryPostCount === 0) {
+                        vm.allCategoryPostCount = response.data.count_total;
+                        vm.selectedCategory.post_count = response.data.count_total;
+                    }
                 });
         };
 

@@ -20,6 +20,7 @@ body {
 
 .container {
     width: 100%;
+    min-width: 970px;
 }
 
 /*header*/
@@ -101,6 +102,7 @@ p.logo-txt {
 
 .head-navigation {
     width: calc(100% - 202px);
+    min-width: 765px;
     margin-left: 11px;
     display: inline-block;
 }
@@ -218,7 +220,7 @@ main {
 
 #magic-line {
     position: absolute;
-    top: 0;
+    top: 2px;
     left: 24px;
     z-index: 99;
     width: 3.93px;
@@ -538,7 +540,7 @@ main {
     font-family: Nunito, sans-serif;
     font-weight: 100;
     font-size: 10pt;
-    line-height: 30px;
+    line-height: 28px;
     color: #8F9DA7;
 
     margin-top: 40px;
@@ -727,7 +729,7 @@ main {
     }
 
     .spinner {
-        left: 45%!important;
+        left: 45% !important;
     }
 
     .logo {
@@ -744,6 +746,7 @@ main {
 
     .container {
         width: 100%;
+        min-width: 0;
         margin: 0 auto;
         padding: 0 5px;
         box-sizing: border-box;
@@ -807,7 +810,7 @@ main {
     }
 
     .head-navigation-mobile li, .main-content-navigation li {
-        margin-bottom: 30px;
+        margin-bottom: 20px;
     }
 
     .head-navigation-mobile {
@@ -957,7 +960,7 @@ main {
 
 }
 
-.loading {
+.loading1 {
     opacity: 0.1;
     -webkit-transition: opacity 0.5s;
     -moz-transition: opacity 0.5s;
@@ -1034,4 +1037,108 @@ main {
     -webkit-transition: opacity 0.5s;
     -moz-transition: opacity 0.5s;
     transition: opacity 0.5s;
+}
+
+.modal {
+    display: block; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 999999;
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background: rgba(255, 255, 255, 0.92);
+}
+
+.modal-header {
+    padding: 2px 16px;
+    height: 146px;
+    background: transparent;
+
+    color: #7E8E99;
+    font-family: Nunito, sans-serif;
+    font-size: 12px;
+    font-weight: 900;
+    line-height: 16px;
+
+}
+
+.header-content {
+    margin: 48px auto 40px;
+    width: 323px;
+}
+
+.title {
+    text-transform: uppercase;
+    width: 100%;
+    display: block;
+    text-align: center;
+    color: #1E2022;
+    font-size: 20px;
+    line-height: 27px;
+    margin-bottom: 15px;
+}
+
+.date {
+}
+
+.rate {
+    margin-left: 35px;
+}
+
+.download {
+    margin-left: 35px;
+    width: 15px;
+    height: 15px;
+    display: inline-block;
+    margin-bottom: -2px;
+    background: url('pictures/Download.svg') 100% 100% no-repeat;
+}
+
+.visit {
+    color: #FF4422;
+    text-decoration: none;
+    margin-left: 37.5px;
+}
+
+/* Modal Body */
+.modal-body {
+    display: inline-block;
+    box-sizing: border-box;
+    border: 10px solid #FFFFFF;
+    border-radius: 2px;
+    box-shadow: 0 0px 15px rgba(0, 0, 0, .15);
+    width: 100%;
+}
+
+.screenshot {
+    width: 100%;
+}
+
+/* Modal Content */
+.modal-content {
+    position: relative;
+    background: transparent;
+    margin: 0 126px 20px 126px;
+    padding: 0;
+    -webkit-animation-name: animatetop;
+    -webkit-animation-duration: 0.4s;
+    animation-name: animatetop;
+    animation-duration: 0.4s
+}
+
+/* The Close Button */
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
 }
