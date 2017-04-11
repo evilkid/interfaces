@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interfaces</title>
-    <base href="/woo">
+    <base href="/wordpress">
     <?php wp_head(); ?>
 
 </head>
@@ -12,7 +12,7 @@
       infinite-scroll-disabled='vm.loading' infinite-scroll-distance="0.5">
     <header>
         <div class="container">
-            <div onclick="window.location='/wordpress'" class="logo">
+            <div onclick="window.location='/woo'" class="logo">
             </div>
             <a href="#" class="hamburger-menu">
                 <span></span>
@@ -121,15 +121,14 @@
                 <div class="double-bounce2"></div>
             </div>
             <section class="content-section lazy" id="content-section" ng-class="{'loading': vm.loading}">
-
                 <div
-                        ng-repeat="p in vm.posts" onclick=""
-                        ng-style="{ background: ' url({{ p.attachments[0].images.medium_large.url }}) 50% 50% no-repeat' }">
-                    <div class="content-description clearfix" data-featherlight="#mylightbox">
-                        <p class="title">{{p.title}}</p>
+                        ng-repeat="p in vm.posts" ng-click="vm.openPost(p, $index)"
+                        ng-style="{ background: ' url({{ vm.getTitleImage(p)}}) 50% 50%/150% no-repeat' }">
+                    <div class="content-description clearfix">
+                        <p class="title1">{{p.title}}</p>
                         <p class="date">{{vm.convertDate(p.date) | date}}</p>
                         <a class="like clearfix" ng-class="{ 'liked': vm.liked(p.content) }"
-                           ng-click="vm.like(p, vm.liked(p.content), $event)">
+                           ng-click="vm.like(p, vm.liked(p.content), $event); $event.stopPropagation();">
                             <svg width="14px" height="13px" viewBox="0 0 14 13" version="1.1"
                                  xmlns="http://www.w3.org/2000/svg">
                                 <g id="Design-flow" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -152,11 +151,6 @@
                 <p id="category-description">
                     {{vm.selectedCategory.description}}
                 </p>
-
-                <button id="myBtn">Open Modal</button>
-
-                <!-- The Modal -->
-
             </section>
         </div>
     </main>
@@ -165,34 +159,49 @@
 
         <!-- Modal content -->
         <div class="modal-content">
+            <span class="left-arrow" ng-click="vm.previousPost()"></span>
+            <span class="right-arrow" ng-click="vm.nextPost()"></span>
+
+            <div class="all-white"></div>
+
             <div class="modal-header">
                 <div class="header-content">
-                    <span class="title">99 designers</span>
-                    <span class="date">DEC 28, 2017</span>
-                    <span class="rate">
+                    <span class="close" ng-click="vm.closePost()"></span>
+                    <span class="title">{{vm.selectedPost.title}}</span>
+                    <span class="date">{{vm.convertDate(vm.selectedPost.date) | date}}</span>
+                    <a class="like rate" ng-class="{ 'liked': vm.liked(vm.selectedPost.content) }"
+                       ng-click="vm.like(vm.selectedPost, vm.liked(vm.selectedPost.content), $event)">
                         <svg width="14px" height="13px" viewBox="0 0 14 13" version="1.1"
                              xmlns="http://www.w3.org/2000/svg">
-                                <g id="Design-flow" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                                    <g id="Home-page---interactions" transform="translate(-604.000000, -649.000000)"
-                                       fill="#7E8E99">
-                                        <g id="card-on-hover" transform="translate(234.000000, 433.000000)">
-                                            <g id="Loyce-Copy" transform="translate(370.000000, 215.000000)">
-                                                <path d="M12.7970258,2.23468863 C11.2005603,0.616568872 8.61394569,0.609511529 7.00890439,2.21889627 L7.00890439,2.21889627 C5.40582487,0.59400966 2.80637056,0.593656136 1.20286068,2.21810665 C-0.400649201,3.84255716 -0.400998074,6.47666535 1.20208145,8.10155195 L6.99955363,14 L7.01513823,13.9842076 L7.01513823,13.9842076 L12.8126104,8.10155195 L12.8126104,8.10155195 C14.4018569,6.47492822 14.3948911,3.85261896 12.7970258,2.23468863 Z"
-                                                      id="Shape"></path>
-                                            </g>
+                            <g id="Design-flow" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                <g id="Home-page---interactions" transform="translate(-604.000000, -649.000000)"
+                                   fill="#7E8E99">
+                                    <g id="card-on-hover" transform="translate(234.000000, 433.000000)">
+                                        <g id="Loyce-Copy" transform="translate(370.000000, 215.000000)">
+                                            <path d="M12.7970258,2.23468863 C11.2005603,0.616568872 8.61394569,0.609511529 7.00890439,2.21889627 L7.00890439,2.21889627 C5.40582487,0.59400966 2.80637056,0.593656136 1.20286068,2.21810665 C-0.400649201,3.84255716 -0.400998074,6.47666535 1.20208145,8.10155195 L6.99955363,14 L7.01513823,13.9842076 L7.01513823,13.9842076 L12.8126104,8.10155195 L12.8126104,8.10155195 C14.4018569,6.47492822 14.3948911,3.85261896 12.7970258,2.23468863 Z"
+                                                  id="Shape"></path>
                                         </g>
                                     </g>
                                 </g>
-                            </svg>
-                        25
+                            </g>
+                        </svg>
 
-                    </span>
-                    <span class="download"></span>
-                    <a href="http://www.google.tn" class="visit" target="_blank">visit website</a>
+                        <span>
+                            {{vm.likes(vm.selectedPost.content)}}
+                        </span>
+                    </a>
+
+                    <a class="download" href="{{vm.getImage('desktop')}}" target="_blank" download></a>
+                    <a href="{{vm.getUrl('website')}}" class="visit" target="_blank" rel="nofollow">visit website</a>
+                </div>
+                <div class="icons">
+                    <span class="mobile" ng-click="vm.loadMobile()" ng-class="{ 'disabled': vm.getImage('mobile') == null }"></span>
+                    <span class="play" ng-click="vm.loadVideo()" ng-class="{ 'disabled': vm.getUrl('video') == null }"></span>
                 </div>
             </div>
-            <div class="modal-body">
-                <img class="screenshot" src="http://localhost/woo/wp-content/uploads/2017/03/Azendoo-product-page-1.jpg" alt="nothing">
+            <div class="modal-body" id="modal-content">
+                <img class="screenshot" id="screenshot" ng-src="{{vm.getImage('desktop')}}" alt="nothing">
+                <div id="video"></div>
             </div>
 
         </div>

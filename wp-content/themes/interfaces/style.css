@@ -499,6 +499,10 @@ main {
     margin: 0;
 }
 
+.title1 {
+    margin-bottom: 157px !important;
+}
+
 .content-description .title {
     margin-bottom: 150px;
 }
@@ -684,7 +688,24 @@ main {
     background-size: cover;
 }
 
+@media (min-width: 1440px) {
+    .title1 {
+        margin-bottom: 183px !important;
+    }
+}
+
+@media (min-width: 1600px) {
+    .title1 {
+        margin-bottom: 212px !important;
+    }
+}
+
 @media (min-width: 1840px) {
+
+    .title1 {
+        margin-bottom: 170px !important;
+    }
+
     .content-section > div {
         width: calc(34% - 26px);
     }
@@ -960,7 +981,7 @@ main {
 
 }
 
-.loading1 {
+.loading {
     opacity: 0.1;
     -webkit-transition: opacity 0.5s;
     -moz-transition: opacity 0.5s;
@@ -1040,7 +1061,7 @@ main {
 }
 
 .modal {
-    display: block; /* Hidden by default */
+    display: none; /* Hidden by default */
     position: fixed; /* Stay in place */
     z-index: 999999;
     left: 0;
@@ -1052,21 +1073,67 @@ main {
 }
 
 .modal-header {
-    padding: 2px 16px;
     height: 146px;
-    background: transparent;
-
+    text-align: center;
+    text-transform: uppercase;
     color: #7E8E99;
     font-family: Nunito, sans-serif;
     font-size: 12px;
     font-weight: 900;
     line-height: 16px;
-
+    position: fixed;
+    width: 1028px;
+    z-index: 11;
 }
 
 .header-content {
     margin: 48px auto 40px;
-    width: 323px;
+    width: 360px;
+    display: inline-block;
+}
+
+.icons {
+    left: 930px;
+    display: inline-block;
+    float: right;
+    margin-top: 82px;
+    position: absolute;
+
+}
+
+.mobile {
+    width: 32px;
+    height: 32px;
+    display: inline-block;
+    background: url('pictures/Mobile.svg') 100% 100% no-repeat;
+    cursor: pointer;
+    margin-left: 15px;
+}
+
+.mobile-active {
+    background: url('pictures/Mobile-active.svg') 100% 100% no-repeat;
+}
+
+.mobile:hover, .play:hover {
+    box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.2), 0 4px 4px 0 rgba(0, 0, 0, 0.2);
+}
+
+.play {
+    width: 32px;
+    height: 32px;
+    display: inline-block;
+    background: url('pictures/Play.svg') 100% 100% no-repeat;
+    cursor: pointer;
+    margin-left: 15px;
+}
+
+.play-active {
+    background: url('pictures/Play-active.svg') 100% 100% no-repeat;
+}
+
+.disabled{
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 .title {
@@ -1100,6 +1167,7 @@ main {
     color: #FF4422;
     text-decoration: none;
     margin-left: 37.5px;
+    text-transform: uppercase;
 }
 
 /* Modal Body */
@@ -1108,11 +1176,21 @@ main {
     box-sizing: border-box;
     border: 10px solid #FFFFFF;
     border-radius: 2px;
-    box-shadow: 0 0px 15px rgba(0, 0, 0, .15);
+    box-shadow: 0 0 15px rgba(0, 0, 0, .15);
     width: 100%;
+    margin-top: 146px;
+}
+
+.mobile-modal-body {
+    width: 414px;
 }
 
 .screenshot {
+    width: 100%;
+}
+
+#video {
+    display: none;
     width: 100%;
 }
 
@@ -1120,20 +1198,29 @@ main {
 .modal-content {
     position: relative;
     background: transparent;
-    margin: 0 126px 20px 126px;
     padding: 0;
     -webkit-animation-name: animatetop;
     -webkit-animation-duration: 0.4s;
     animation-name: animatetop;
-    animation-duration: 0.4s
+    animation-duration: 0.4s;
+    width: 1028px;
+    margin: 0 auto;
+    text-align: center;
 }
 
 /* The Close Button */
 .close {
-    color: #aaa;
+    color: #000;
+    position: absolute;
+    left: calc(100% + 46px);
+    top: 30px;
     float: right;
     font-size: 28px;
     font-weight: bold;
+    opacity: 1;
+    background: url('pictures/Close.svg') 100% 100% no-repeat;
+    width: 22px;
+    height: 22px;
 }
 
 .close:hover,
@@ -1141,4 +1228,43 @@ main {
     color: black;
     text-decoration: none;
     cursor: pointer;
+}
+
+.left-arrow {
+    position: absolute;
+    left: -50px;
+    top: 370px;
+    background: url('pictures/Arrow.svg') 100% 100% no-repeat;
+    width: 15px;
+    height: 25px;
+
+    cursor: pointer;
+
+    -moz-transform: scaleX(-1);
+    -o-transform: scaleX(-1);
+    -webkit-transform: scaleX(-1);
+    transform: scaleX(-1);
+    filter: FlipH;
+    -ms-filter: "FlipH";
+}
+
+.right-arrow {
+    position: absolute;
+    left: calc(100% + 50px);
+    top: 370px;
+    background: url('pictures/Arrow.svg') 100% 100% no-repeat;
+    width: 15px;
+    height: 25px;
+
+    cursor: pointer;
+}
+
+.all-white {
+    z-index: 10;
+    position: fixed;
+    width: calc(100% - 15px);
+    height: 126px;
+    background: white;
+    top: 0;
+    left: 0;
 }

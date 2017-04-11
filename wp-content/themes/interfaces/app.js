@@ -12,8 +12,8 @@
     function InterfacesController($timeout, $location, $http, $httpParamSerializerJQLike) {
         var vm = this;
 
-        vm.BASE_URL = "/woo";
-        // vm.BASE_URL = "/wordpress";
+        // vm.BASE_URL = "/woo";
+        vm.BASE_URL = "/wordpress";
 
         vm.url = "?json=get_posts&&count=16";
 
@@ -33,7 +33,6 @@
 
             if (url.length > 6) {
                 product = url[5];
-                console.log("pard", url[5]);
             }
 
             $http.get(vm.url + tmpUrl)
@@ -42,12 +41,26 @@
                     vm.posts = response.data.posts;
                     vm.totalPages = response.data.pages;
 
+
                     $timeout(function () {
                         $(window).trigger('resize');
                     }, 0, false);
 
 
-                    vm.loading = false;
+                    if (product) {
+                        $http.get(vm.url + vm.SELECT_BY_SLUG + product)
+                            .then(function (response) {
+
+                                if (response.data.count) {
+                                    vm.openPost(response.data.posts[0], -1);
+                                }
+
+                                vm.loading = false;
+                            });
+
+                    } else {
+                        vm.loading = false;
+                    }
 
                     $(".posts-find").show();
 
@@ -109,7 +122,10 @@
         vm.COMPARE_BY_DATE = "&orderby=date";
         vm.COMPARE_BY_RATE = "&meta_key=_liked&orderby=meta_value_num";
 
+        vm.SELECT_BY_SLUG = "&meta_key=slug&meta_value=";
+
         vm.selectedCategory = {id: 0, title: "All categories"};
+        vm.selectedPost = null;
 
         vm.categories = [];
 
@@ -122,6 +138,8 @@
 
         vm.totalPages = 0;
         vm.currentPage = 1;
+
+        vm.currentPostIndex = -1;
 
         vm.loading = true;
 
@@ -152,7 +170,6 @@
             if (content) {
                 return content.indexOf("unlike") !== -1;
             } else {
-                console.log(content);
             }
         };
 
@@ -184,6 +201,7 @@
                     $($event.currentTarget).removeClass("liked");
                     post.content = "";
                 }
+
                 $($event.currentTarget).find("span").text($($.parseXML(result.data)).find("response_data").text().replace("+", ""));
             }, function (error) {
                 console.log(error);
@@ -191,7 +209,6 @@
         };
 
         vm.loadPosts = function () {
-            console.log("loading post...");
 
             if (vm.totalPages && vm.totalPages !== vm.currentPage) {
                 vm.loading = true;
@@ -231,11 +248,6 @@
 
                     vm.posts_count = response.data.count_total;
 
-                    console.log(vm.selectedCategory.id);
-                    console.log(vm.allCategoryPostCount);
-                    console.log(response);
-                    console.log(category);
-
                     if (vm.selectedCategory.id === 0 && vm.allCategoryPostCount === 0) {
                         vm.allCategoryPostCount = response.data.count_total;
                         vm.selectedCategory.post_count = response.data.count_total;
@@ -266,14 +278,177 @@
 
                     });
             }
+        };
+
+        vm.closePost = function () {
+            if (vm.selectedCategory.slug) {
+                window.history.pushState({"pageTitle": vm.selectedCategory.title}, "", "." + vm.BASE_URL + "/" + vm.selectedCategory.slug);
+            } else {
+                window.history.pushState({"pageTitle": vm.selectedCategory.title}, "", "." + vm.BASE_URL + "/");
+            }
+
+            $("#myModal").hide();
+            $('html, body').css('overflow', 'auto');
+        };
+
+        vm.openPost = function (post, index) {
+
+            vm.selectedPost = post;
+            vm.currentPostIndex = index;
+
+
+
+            if (vm.selectedCategory.slug) {
+                window.history.pushState({"pageTitle": vm.selectedPost.title}, "", "." + vm.BASE_URL + "/" + vm.selectedCategory.slug + "/" + vm.getSlug());
+            } else {
+                if (vm.selectedPost && vm.selectedPost.categories && vm.selectedPost.categories[0] && vm.selectedPost.categories[0].slug) {
+                    window.history.pushState({"pageTitle": vm.selectedPost.title}, "", "." + vm.BASE_URL + "/" + vm.selectedPost.categories[0].slug + "/" + vm.getSlug());
+                }
+            }
+
+            $("#myModal").show();
+            $('html, body').css('overflow', 'hidden');
+
+        };
+
+        vm.previousPost = function () {
+            if (vm.currentPostIndex > 0) {
+                vm.openPost(vm.posts[--vm.currentPostIndex], vm.currentPostIndex);
+            }
+        };
+
+        vm.nextPost = function () {
+            console.log(vm.currentPostIndex);
+            console.log(vm.posts.length);
+            if (vm.currentPostIndex < vm.posts.length - 1) {
+                vm.openPost(vm.posts[++vm.currentPostIndex], vm.currentPostIndex);
+            }
+        };
+
+        vm.getImage = function (name) {
+            name += "-image";
+            var post = vm.selectedPost;
+
+            if (post && post.custom_fields && post.custom_fields[name] && post.custom_fields[name][0]) {
+
+                var res = post.attachments.filter(function (attachment) {
+                    return attachment.id == post.custom_fields[name][0];
+                });
+
+                return res && res[0] && res[0].url ? res[0].url : "";
+            }
+
+            return null;
+        };
+
+        vm.getUrl = function (name) {
+            name += "-url";
+            var post = vm.selectedPost;
+
+            return post && post.custom_fields && post.custom_fields[name] && post.custom_fields[name][0] ? post.custom_fields[name][0] : null;
+        };
+
+        vm.getSlug = function () {
+            var name = "slug";
+            var post = vm.selectedPost;
+
+            return post && post.custom_fields && post.custom_fields[name] && post.custom_fields[name][0] ? post.custom_fields[name][0] : "";
+        };
+
+
+        vm.loadVideo = function () {
+            if ($(".play").hasClass("play-active")) {
+                $(".play").removeClass("play-active");
+                $("#video").hide();
+                if ($(".mobile").hasClass("mobile-active")) {
+                    $("#screenshot").attr("src", vm.getImage("mobile"));
+                    $("#screenshot").show();
+                } else {
+                    $("#screenshot").attr("src", vm.getImage("desktop"));
+                    $("#screenshot").show();
+                }
+            } else {
+                $(".play").addClass("play-active");
+                $("#screenshot").hide();
+
+                if ($(".mobile").hasClass("mobile-active")) {
+                    $("#video").html('<iframe width="100%" height="567" src="https://player.vimeo.com/video/'
+                        + getVimeoId(vm.getUrl('mobile-video')) + '" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>')
+                } else {
+                    $("#video").html('<iframe width="100%" height="567" src="https://player.vimeo.com/video/'
+                        + getVimeoId(vm.getUrl('video')) + '" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>')
+                }
+                $("#video").show();
+            }
+        };
+
+        vm.loadMobile = function () {
+            if ($(".mobile").hasClass("mobile-active")) {
+                $(".mobile").removeClass("mobile-active");
+                $("#modal-content").removeClass("mobile-modal-body");
+
+
+                if ($(".play").hasClass("play-active")) {
+                    $("#screenshot").hide();
+                    $("#video").html('<iframe width="100%" height="567" src="https://player.vimeo.com/video/'
+                        + getVimeoId(vm.getUrl('video')) + '" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>')
+                    $("#video").show();
+                } else {
+                    $("#screenshot").attr("src", vm.getImage("desktop"));
+                    $("#screenshot").show();
+                }
+            } else {
+                $(".mobile").addClass("mobile-active");
+
+                $("#modal-content").addClass("mobile-modal-body");
+                if ($(".play").hasClass("play-active")) {
+                    $("#screenshot").hide();
+                    $("#video").html('<iframe width="100%" height="567" src="https://player.vimeo.com/video/'
+                        + getVimeoId(vm.getUrl('mobile-video')) + '" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>')
+                    $("#video").show();
+                } else {
+                    $("#screenshot").attr("src", vm.getImage("mobile"));
+                    $("#screenshot").show();
+                }
+            }
+        };
+
+        vm.getTitleImage = function (post) {
+            var name = "title-image";
+
+
+            if (post && post.custom_fields && post.custom_fields[name] && post.custom_fields[name][0]) {
+
+                var res = post.attachments.filter(function (attachment) {
+                    return attachment.id == post.custom_fields[name][0];
+                });
+
+                return res && res[0] && res[0].url ? res[0].url : "";
+            }
+
+            return null;
         }
 
+        window.onclick = function (event) {
+            if (event.target == document.getElementById('myModal')) {
+                vm.closePost();
+            }
+        }
     }
 
     function likes(content) {
         var parsed = $(content);
 
         return parsed.find(".count-box").text().replace("+", "");
+    }
+
+    function getVimeoId(url) {
+        var regExp = /http(s)?:\/\/(www\.)?vimeo.com\/(\d+)(\/)?(#.*)?/
+
+        var match = url.match(regExp)
+
+        if (match)
+            return match[3]
     }
 
 })(angular);
