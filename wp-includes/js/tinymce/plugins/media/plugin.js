@@ -558,7 +558,7 @@ tinymce.PluginManager.add('media', function(editor, url) {
 								return;
 							}
 
-							hasImage = true;
+							hasMobile = true;
 							break;
 					}
 				}
@@ -585,7 +585,7 @@ tinymce.PluginManager.add('media', function(editor, url) {
 					}
 				}
 
-				if (data.poster && name == "object" && updateAll && !hasImage) {
+				if (data.poster && name == "object" && updateAll && !hasMobile) {
 					var imgAttrs = [];
 					imgAttrs.map = {};
 

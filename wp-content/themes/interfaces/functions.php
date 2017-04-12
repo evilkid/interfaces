@@ -20,9 +20,9 @@ function interfaces_scripts()
     wp_enqueue_script('interfaces-script-ng', 'https://ajax.googleapis.com/ajax/libs/angularjs/1.6.3/angular.min.js', array('jquery'), $scriptVersion, true);
     wp_enqueue_script('interfaces-script-ng-animate', 'https://ajax.googleapis.com/ajax/libs/angularjs/1.6.3/angular-animate.min.js', array('jquery'), $scriptVersion, true);
     wp_enqueue_script('interfaces-script-ng-route', 'https://ajax.googleapis.com/ajax/libs/angularjs/1.6.3/angular-route.min.js', array('jquery'), $scriptVersion, true);
+    wp_enqueue_script('interfaces-script-ng-touch', 'https://ajax.googleapis.com/ajax/libs/angularjs/1.6.3/angular-touch.min.js', array('jquery'), $scriptVersion, true);
     wp_enqueue_script('interfaces-script-ng-scroll', get_template_directory_uri() . '/ng-infinite-scroll.js', null, $scriptVersion, true);
     wp_enqueue_script('interfaces-script-ng-app', get_template_directory_uri() . '/app.js', null, $scriptVersion, true);
-    wp_enqueue_script('interfaces-script-feather', '//cdn.rawgit.com/noelboss/featherlight/1.7.2/release/featherlight.min.js', array('jquery'), $scriptVersion, true);
 }
 
 add_action('wp_enqueue_scripts', 'interfaces_scripts');

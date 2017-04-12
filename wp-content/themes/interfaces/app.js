@@ -1,7 +1,7 @@
 (function (angular) {
     "use strict";
 
-    var app = angular.module("app", ["infinite-scroll", "ngAnimate"]);
+    var app = angular.module("app", ["infinite-scroll", "ngAnimate", "ngTouch"]);
 
     app.config(function ($locationProvider) {
         $locationProvider.html5Mode(true);
@@ -12,8 +12,8 @@
     function InterfacesController($timeout, $location, $http, $httpParamSerializerJQLike) {
         var vm = this;
 
-        // vm.BASE_URL = "/woo";
-        vm.BASE_URL = "/wordpress";
+        vm.BASE_URL = "/woo";
+        // vm.BASE_URL = "/wordpress";
 
         vm.url = "?json=get_posts&&count=16";
 
@@ -202,6 +202,16 @@
                     post.content = "";
                 }
 
+                var likeCount = $($.parseXML(result.data)).find("response_data").text().replace("+", "");
+
+                if ($("#post" + post.id + "-like")) {
+                    $("#post" + post.id + "-like").text(likeCount);
+                }
+
+                if ($("#post" + post.id + "-like-modal")) {
+                    $("#post" + post.id + "-like-modal").text(likeCount);
+                }
+
                 $($event.currentTarget).find("span").text($($.parseXML(result.data)).find("response_data").text().replace("+", ""));
             }, function (error) {
                 console.log(error);
@@ -287,16 +297,25 @@
                 window.history.pushState({"pageTitle": vm.selectedCategory.title}, "", "." + vm.BASE_URL + "/");
             }
 
+            vm.reloadPost();
+            $("#content-section").removeClass("loading");
+        };
+
+        vm.reloadPost = function () {
+            $(".play").removeClass("play-active");
+            $(".mobile").removeClass("mobile-active");
+            $("#modal-content").removeClass("mobile-modal-body");
+
+            $("#video").empty();
             $("#myModal").hide();
             $('html, body').css('overflow', 'auto');
         };
 
         vm.openPost = function (post, index) {
+            console.log(post);
 
             vm.selectedPost = post;
             vm.currentPostIndex = index;
-
-
 
             if (vm.selectedCategory.slug) {
                 window.history.pushState({"pageTitle": vm.selectedPost.title}, "", "." + vm.BASE_URL + "/" + vm.selectedCategory.slug + "/" + vm.getSlug());
@@ -306,6 +325,15 @@
                 }
             }
 
+            vm.hasMobile = vm.getImage("mobile");
+            vm.hasVideo = vm.getUrl('video');
+
+
+            $("#video").empty();
+            vm.loading = true;
+            $("#screenshot").addClass("loading");
+            $("#screenshot").attr("src", vm.getImage("desktop"));
+            $("#screenshot").show();
             $("#myModal").show();
             $('html, body').css('overflow', 'hidden');
 
@@ -326,7 +354,12 @@
         };
 
         vm.getImage = function (name) {
-            name += "-image";
+            if ($(window).width() > 480) {
+                name += "-image";
+            } else {
+                name = "mobile-image"
+            }
+
             var post = vm.selectedPost;
 
             if (post && post.custom_fields && post.custom_fields[name] && post.custom_fields[name][0]) {
@@ -355,67 +388,91 @@
             return post && post.custom_fields && post.custom_fields[name] && post.custom_fields[name][0] ? post.custom_fields[name][0] : "";
         };
 
+        vm.hasVideo = false;
+        vm.hasMobile = false;
 
         vm.loadVideo = function () {
-            if ($(".play").hasClass("play-active")) {
-                $(".play").removeClass("play-active");
-                $("#video").hide();
-                if ($(".mobile").hasClass("mobile-active")) {
-                    $("#screenshot").attr("src", vm.getImage("mobile"));
-                    $("#screenshot").show();
-                } else {
-                    $("#screenshot").attr("src", vm.getImage("desktop"));
-                    $("#screenshot").show();
-                }
-            } else {
-                $(".play").addClass("play-active");
-                $("#screenshot").hide();
+            if (vm.hasVideo) {
+                $(".play").toggleClass("play-active");
 
-                if ($(".mobile").hasClass("mobile-active")) {
-                    $("#video").html('<iframe width="100%" height="567" src="https://player.vimeo.com/video/'
-                        + getVimeoId(vm.getUrl('mobile-video')) + '" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>')
+                if ($(".play").hasClass("play-active")) {
+                    $("#screenshot").hide();
+
+
+                    if ($(".mobile").hasClass("mobile-active")) {
+                        $("#video").html('<iframe width="100%" height="567" src="https://player.vimeo.com/video/'
+                            + getVimeoId(vm.getUrl('mobile-video')) + '?autoplay=1" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>')
+
+                    } else {
+                        $("#video").html('<iframe width="100%" height="567" src="https://player.vimeo.com/video/'
+                            + getVimeoId(vm.getUrl('video')) + '?autoplay=1" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>')
+
+                    }
+                    $("#video").show();
+
+                    vm.hasMobile = vm.getUrl("video");
                 } else {
-                    $("#video").html('<iframe width="100%" height="567" src="https://player.vimeo.com/video/'
-                        + getVimeoId(vm.getUrl('video')) + '" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>')
+                    vm.hasMobile = vm.getImage("mobile");
+                    vm.hasVideo = vm.getUrl("video");
+                    $("#video").empty();
+
+                    vm.loading = true;
+                    $("#screenshot").addClass("loading");
+                    if ($(".mobile").hasClass("mobile-active")) {
+                        $("#screenshot").attr("src", vm.getImage("mobile"));
+                    } else {
+                        $("#screenshot").attr("src", vm.getImage("desktop"));
+                    }
+                    $("#screenshot").show();
                 }
-                $("#video").show();
             }
         };
 
         vm.loadMobile = function () {
-            if ($(".mobile").hasClass("mobile-active")) {
-                $(".mobile").removeClass("mobile-active");
-                $("#modal-content").removeClass("mobile-modal-body");
+            if (vm.hasMobile) {
+                $(".mobile").toggleClass("mobile-active");
 
+                if ($(".mobile").hasClass("mobile-active")) {
+                    $("#modal-content").addClass("mobile-modal-body");
 
-                if ($(".play").hasClass("play-active")) {
-                    $("#screenshot").hide();
-                    $("#video").html('<iframe width="100%" height="567" src="https://player.vimeo.com/video/'
-                        + getVimeoId(vm.getUrl('video')) + '" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>')
-                    $("#video").show();
+                    vm.hasVideo = vm.getUrl("mobile-video");
+
+                    if ($(".play").hasClass("play-active")) {
+                        $("#screenshot").hide();
+                        $("#video").html('<iframe width="100%" height="567" src="https://player.vimeo.com/video/'
+                            + getVimeoId(vm.getUrl('mobile-video')) + '?autoplay=1" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>')
+                        $("#video").show();
+                    } else {
+                        $("#video").empty();
+                        vm.loading = true;
+                        $("#screenshot").addClass("loading");
+                        $("#screenshot").attr("src", vm.getImage("mobile"));
+                        $("#screenshot").show();
+                    }
+
                 } else {
-                    $("#screenshot").attr("src", vm.getImage("desktop"));
-                    $("#screenshot").show();
-                }
-            } else {
-                $(".mobile").addClass("mobile-active");
+                    $("#modal-content").removeClass("mobile-modal-body");
+                    vm.hasVideo = vm.getUrl("video");
 
-                $("#modal-content").addClass("mobile-modal-body");
-                if ($(".play").hasClass("play-active")) {
-                    $("#screenshot").hide();
-                    $("#video").html('<iframe width="100%" height="567" src="https://player.vimeo.com/video/'
-                        + getVimeoId(vm.getUrl('mobile-video')) + '" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>')
-                    $("#video").show();
-                } else {
-                    $("#screenshot").attr("src", vm.getImage("mobile"));
-                    $("#screenshot").show();
+                    if ($(".play").hasClass("play-active")) {
+                        $("#screenshot").hide();
+                        $("#video").html('<iframe width="100%" height="567" src="https://player.vimeo.com/video/'
+                            + getVimeoId(vm.getUrl('video')) + '?autoplay=1" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>')
+                        $("#video").show();
+                    } else {
+                        $("#video").empty();
+                        vm.loading = true;
+                        $("#screenshot").addClass("loading");
+                        $("#screenshot").attr("src", vm.getImage("desktop"));
+                        $("#screenshot").show();
+                    }
+
                 }
             }
         };
 
         vm.getTitleImage = function (post) {
             var name = "title-image";
-
 
             if (post && post.custom_fields && post.custom_fields[name] && post.custom_fields[name][0]) {
 
@@ -427,13 +484,20 @@
             }
 
             return null;
-        }
+        };
 
         window.onclick = function (event) {
             if (event.target == document.getElementById('myModal')) {
                 vm.closePost();
             }
-        }
+        };
+
+        $("#screenshot").load(function () {
+            $(".spinner").hide();
+            $("#content-section").removeClass("loading");
+            $("#screenshot").removeClass("loading");
+            vm.loading = false;
+        })
     }
 
     function likes(content) {

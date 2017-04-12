@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interfaces</title>
-    <base href="/wordpress">
+    <base href="/woo">
     <?php wp_head(); ?>
 
 </head>
@@ -144,7 +144,7 @@
                                 </g>
                             </svg>
 
-                            <span>{{vm.likes(p.content)}}</span></a>
+                            <span id="post{{p.id}}-like">{{vm.likes(p.content)}}</span></a>
                     </div>
                 </div>
 
@@ -155,7 +155,7 @@
         </div>
     </main>
 
-    <div id="myModal" class="modal">
+    <div id="myModal" class="modal" ng-swipe-left="vm.nextPost()" ng-swipe-right="vm.previousPost()">
 
         <!-- Modal content -->
         <div class="modal-content">
@@ -186,7 +186,7 @@
                             </g>
                         </svg>
 
-                        <span>
+                        <span id="post{{vm.selectedPost.id}}-like-modal">
                             {{vm.likes(vm.selectedPost.content)}}
                         </span>
                     </a>
@@ -195,8 +195,8 @@
                     <a href="{{vm.getUrl('website')}}" class="visit" target="_blank" rel="nofollow">visit website</a>
                 </div>
                 <div class="icons">
-                    <span class="mobile" ng-click="vm.loadMobile()" ng-class="{ 'disabled': vm.getImage('mobile') == null }"></span>
-                    <span class="play" ng-click="vm.loadVideo()" ng-class="{ 'disabled': vm.getUrl('video') == null }"></span>
+                    <span class="mobile" ng-click="vm.loadMobile()" ng-class="{ 'disabled': !vm.hasMobile }"></span>
+                    <span class="play" ng-click="vm.loadVideo()" ng-class="{ 'disabled': !vm.hasVideo }"></span>
                 </div>
             </div>
             <div class="modal-body" id="modal-content">

@@ -185,8 +185,5 @@ $(window).on("load", function () {
         return (35 / 66) * width;
     }
 
-    // Get the modal
-    var modal = document.getElementById('myModal');
-
-// When the user clicks anywhere outside of the modal, close it
 });
+
